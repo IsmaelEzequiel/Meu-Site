@@ -8,7 +8,7 @@
 
 .App {
   background: linear-gradient(120deg, #4568dc, #b06ab3);
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
