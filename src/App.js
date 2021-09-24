@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Trans } from 'react-i18next'
 import AOS from "aos";
 import "aos/dist/aos.css";
-import './App.css';
 
 import linkedin from './assets/images/linkedin.png'
 import instagram from './assets/images/instagram.png'
