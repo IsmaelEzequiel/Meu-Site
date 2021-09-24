@@ -13,7 +13,7 @@
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Javascript Developer =D"
     />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -29,6 +29,16 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Ismael Ezequiel</title>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YVGV20E3C5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YVGV20E3C5');
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
