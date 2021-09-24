@@ -37,7 +37,7 @@ const App = () => {
           </p>
           <ul className="social-networks" data-aos="fade-up" data-aos-duration="1500">
             <li><a href="https://www.linkedin.com/in/ismaelezequiel/" target="_blank" rel="noreferrer"><img alt="linkedin" src={linkedin} /></a></li>
-            <li><a href="mailto:ismaelezequiel.com.br" target="_blank" rel="noreferrer"><img alt="mail" src={mail} /></a></li>
+            <li><a href="mailto:contato@ismaelezequiel.com.br" target="_blank" rel="noreferrer"><img alt="mail" src={mail} /></a></li>
             <li><a href="https://github.com/ismaelezequiel" target="_blank" rel="noreferrer"><img alt="github" src={github} /></a></li>
             <li><a href="https://twitter.com/Ismael_Ezequiel" target="_blank" rel="noreferrer"><img alt="twitter" src={twitter} /></a></li>
             <li><a href="https://www.twitch.tv/ismaelezequiel182" target="_blank" rel="noreferrer"><img alt="twitch" src={twitch} /></a></li>
