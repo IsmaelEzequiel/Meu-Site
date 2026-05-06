@@ -1,70 +1,93 @@
-# Getting Started with Create React App
+# ismael.dev
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Personal site — terminal-flavored React app + Express/Prisma backend.
 
-## Available Scripts
+```
+.
+├── src/                 # Vite + React frontend
+├── public/              # static assets (favicons, posts, resume.md, pdf)
+├── server/              # Express + Prisma API (guestbook, image uploads)
+├── index.html
+├── vite.config.js       # proxies /api and /uploads → http://localhost:4000
+└── package.json
+```
 
-In the project directory, you can run:
+## Quick start
 
-### `yarn start`
+### 1. Install
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```bash
+npm install
+npm --prefix server install
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 2. Database
 
-### `yarn test`
+The backend needs Postgres. Spin one up however you like — Docker is fastest:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+docker run --name ismael-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ismael_dev -p 5432:5432 -d postgres:16
+```
 
-### `yarn build`
+Then configure the server:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+cp server/.env.example server/.env
+# edit server/.env if your DATABASE_URL differs
+npm --prefix server run prisma:migrate -- --name init
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 3. Run both processes
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm run dev:all
+```
 
-### `yarn eject`
+That runs Vite (port **3000**) and the API (port **4000**) together. Or run them separately:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+npm run dev          # frontend only
+npm run dev:server   # backend only
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Open <http://localhost:3000>.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Routes
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- `/` home
+- `/about` about
+- `/blog` post list — markdown files in `public/posts/`
+- `/blog/:slug` rendered post
+- `/contact` contact info
+- `/resume` rendered resume
+- `/guestbook` guestbook (reads/writes via `/api/guestbook`)
+- `/admin` upload manager (login with `ADMIN_PASSWORD` from `server/.env`)
 
-## Learn More
+## API
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+| Method | Path                | Notes                                          |
+| ------ | ------------------- | ---------------------------------------------- |
+| GET    | `/api/health`       | health probe                                   |
+| GET    | `/api/guestbook`    | list entries (newest first)                    |
+| POST   | `/api/guestbook`    | `{ nick, message }` — nick ≤24, message ≤280   |
+| POST   | `/api/admin/login`  | `{ password }` → `{ token }`                   |
+| GET    | `/api/admin/me`     | verify token (admin)                           |
+| GET    | `/api/uploads`      | list uploaded files (admin)                    |
+| POST   | `/api/uploads`      | multipart `file=<image>` (admin)               |
+| DELETE | `/api/uploads/:id`  | delete upload (admin)                          |
+| GET    | `/uploads/:name`    | public static file, served by Express          |
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Keyboard shortcuts
 
-### Code Splitting
+- `⌘K` / `Ctrl+K` — command palette
+- `g h/a/b/c/r/g` — jump to home / about / blog / contact / resume / guestbook (vim-style leader)
+- `t` — toggle theme
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Build
 
-### Analyzing the Bundle Size
+```bash
+npm run build      # frontend → dist/
+npm --prefix server start   # production server
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The site is intentionally simple: hash routing, no SSR, markdown rendered client-side.

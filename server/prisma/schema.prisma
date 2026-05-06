@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model GuestbookEntry {
+  id        Int      @id @default(autoincrement())
+  nick      String   @db.VarChar(24)
+  message   String   @db.VarChar(280)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("guestbook_entries")
+}
+
+model Upload {
+  id           Int      @id @default(autoincrement())
+  filename     String   @unique
+  originalName String   @map("original_name")
+  mimeType     String   @map("mime_type")
+  size         Int
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("uploads")
+}
