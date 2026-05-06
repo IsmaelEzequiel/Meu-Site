@@ -1,5 +1,8 @@
 server {
-  listen 80;
+  # ${PORT} is substituted at container startup by the nginx image's
+  # envsubst entrypoint (see NGINX_ENVSUBST_FILTER_VARS in the Dockerfile).
+  # Defaults to 80 for compose; Railway injects its own PORT.
+  listen ${PORT};
   server_name _;
   root /usr/share/nginx/html;
   index index.html;
