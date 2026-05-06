@@ -90,4 +90,38 @@ npm run build      # frontend → dist/
 npm --prefix server start   # production server
 ```
 
+## Deploy with Docker
+
+Two Dockerfiles + a `docker-compose.yml` bring up Postgres, the API, and the
+nginx-served frontend together.
+
+```bash
+cp .env.example .env             # set ADMIN_PASSWORD at minimum
+docker compose up -d --build
+docker compose exec server npx prisma migrate deploy   # one-time
+```
+
+Open <http://localhost:8080> (override with `HTTP_PORT`).
+
+Image layout:
+
+- **`./Dockerfile`** — frontend. Stage 1: `node:22-alpine` runs `vite build`.
+  Stage 2: `nginx:1.27-alpine` serves `dist/` and proxies `/api` + `/uploads`
+  to the `server` container. `nginx.conf` lives next to the Dockerfile.
+- **`./server/Dockerfile`** — backend. Three stages on `node:22-alpine`:
+  install all deps, generate the Prisma client, then a slim runtime stage
+  that copies only `--omit=dev` deps + the generated client + app source.
+  Runs as `node` user under `tini`.
+
+Uploaded images persist in the `uploads` named volume; the database in
+`db_data`. Both survive `docker compose down`; remove with
+`docker compose down -v`.
+
+Building images individually (no compose):
+
+```bash
+docker build -t ismael-web .                   # frontend
+docker build -t ismael-server ./server         # backend
+```
+
 The site is intentionally simple: hash routing, no SSR, markdown rendered client-side.
