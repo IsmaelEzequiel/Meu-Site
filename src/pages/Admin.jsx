@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Prompt from '../components/Prompt.jsx';
 import { adminFetch, checkAuth, clearToken, fmtBytes, getToken, login } from '../lib/admin.js';
+import { API_BASE, apiUrl } from '../lib/api.js';
 
 function LoginForm({ onSuccess }) {
   const [password, setPassword] = useState('');
@@ -120,7 +121,7 @@ function FileManager({ onLogout }) {
   };
 
   const copy = (file) => {
-    const fullUrl = window.location.origin + file.url;
+    const fullUrl = (API_BASE || window.location.origin) + file.url;
     navigator.clipboard?.writeText(fullUrl);
     setCopied(file.id);
     setTimeout(() => setCopied(c => (c === file.id ? null : c)), 1500);
@@ -185,9 +186,9 @@ function FileManager({ onLogout }) {
           <div className="upload-grid">
             {files.map(f => (
               <div key={f.id} className="upload-card">
-                <a href={f.url} target="_blank" rel="noreferrer" className="upload-thumb">
+                <a href={apiUrl(f.url)} target="_blank" rel="noreferrer" className="upload-thumb">
                   {f.mimeType.startsWith('image/')
-                    ? <img src={f.url} alt={f.originalName} loading="lazy" />
+                    ? <img src={apiUrl(f.url)} alt={f.originalName} loading="lazy" />
                     : <div className="upload-fallback">{f.mimeType}</div>}
                 </a>
                 <div className="upload-meta">

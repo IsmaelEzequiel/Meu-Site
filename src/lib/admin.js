@@ -1,3 +1,5 @@
+import { apiUrl } from './api.js';
+
 const TOKEN_KEY = 'admin_token';
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
@@ -8,7 +10,7 @@ export async function adminFetch(url, options = {}) {
   const token = getToken();
   const headers = { ...(options.headers || {}) };
   if (token) headers.Authorization = `Bearer ${token}`;
-  const r = await fetch(url, { ...options, headers });
+  const r = await fetch(apiUrl(url), { ...options, headers });
   if (r.status === 401) {
     clearToken();
     throw new Error('unauthorized');
@@ -17,7 +19,7 @@ export async function adminFetch(url, options = {}) {
 }
 
 export async function login(password) {
-  const r = await fetch('/api/admin/login', {
+  const r = await fetch(apiUrl('/api/admin/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password }),

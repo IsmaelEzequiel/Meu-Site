@@ -4,6 +4,13 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 
+# When set, the bundle calls the API at this absolute URL instead of using
+# relative paths. Required when frontend and backend live on different
+# domains (e.g. Railway split services). Leave unset for the
+# nginx-proxy-in-front-of-server compose deploy.
+ARG VITE_API_URL=""
+ENV VITE_API_URL=$VITE_API_URL
+
 COPY package.json package-lock.json ./
 RUN npm ci
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Prompt from '../components/Prompt.jsx';
+import { apiUrl } from '../lib/api.js';
 
 export default function Guestbook() {
   const [entries, setEntries] = useState([]);
@@ -12,7 +13,7 @@ export default function Guestbook() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/guestbook')
+    fetch(apiUrl('/api/guestbook'))
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -29,7 +30,7 @@ export default function Guestbook() {
     if (msg.length > 280) { setErr('max 280 characters'); return; }
     setErr(''); setBusy(true);
     try {
-      const r = await fetch('/api/guestbook', {
+      const r = await fetch(apiUrl('/api/guestbook'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nick: nick.trim(), message: msg.trim() }),

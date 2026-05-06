@@ -120,8 +120,49 @@ Uploaded images persist in the `uploads` named volume; the database in
 Building images individually (no compose):
 
 ```bash
-docker build -t ismael-web .                   # frontend
-docker build -t ismael-server ./server         # backend
+docker build -t ismael-web .                                  # frontend
+docker build -t ismael-server ./server                        # backend
+docker build -t ismael-web --build-arg VITE_API_URL=https://api.example.com .  # split-domain
 ```
+
+## Deploy on Railway (split services)
+
+When the frontend and backend live on different Railway services, the
+frontend bundle has to know the backend's URL at *build time*, and the
+backend has to allow the frontend's origin.
+
+**Backend service** (root: `server/`)
+
+| Variable          | Value                                                                     |
+| ----------------- | ------------------------------------------------------------------------- |
+| `DATABASE_URL`    | injected by Railway's Postgres add-on                                     |
+| `ADMIN_PASSWORD`  | `openssl rand -hex 24`                                                    |
+| `CORS_ORIGIN`     | `https://your-frontend.up.railway.app`                                    |
+| `PORT`            | injected by Railway (server already binds to `process.env.PORT`)          |
+| `MAX_UPLOAD_MB`   | `8` (optional)                                                            |
+
+After the first deploy, run the migration once:
+
+```bash
+railway run --service server -- npx prisma migrate deploy
+```
+
+**Frontend service** (root: `.`)
+
+Set this Build-time variable in Railway (it's a Docker build arg, not a
+runtime env):
+
+```
+VITE_API_URL=https://server-production-9e07.up.railway.app
+```
+
+Then trigger a redeploy so the Docker build picks it up. The bundle will
+call the backend at that absolute URL; the nginx proxy in `nginx.conf`
+becomes inert in this mode (it only kicks in when `VITE_API_URL` is empty
+and frontend + backend share a host).
+
+> **Persisting uploads on Railway**: by default container filesystems are
+> ephemeral. Attach a Railway Volume to the server service mounted at
+> `/app/uploads`, otherwise uploaded images disappear on redeploy.
 
 The site is intentionally simple: hash routing, no SSR, markdown rendered client-side.
